@@ -85,6 +85,9 @@ export function mock<T extends {}>(): T & MockInstance<T> {
   const inner = {} as any;
   return new Proxy({__id__: `#${id()}`}, {
     get(_, key, __) {
+      if (key === "then") {
+        return undefined;
+      }
       return inner[key] = inner[key] ?? createMock();
     }
   }) as any;
