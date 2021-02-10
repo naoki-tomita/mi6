@@ -79,7 +79,7 @@ type MockInstance<T extends Instance> = {
 
 const CHARS = "abcdefghijklmnopqrstuvwxyz";
 function id() {
-  return Array(5).fill(null).map(() => Math.floor(Math.random() * CHARS.length)).join("");
+  return Array(5).fill(null).map(() => CHARS[Math.floor(Math.random() * CHARS.length)]).join("");
 }
 export function mock<T extends {}>(): T & MockInstance<T> {
   const inner = {} as any;
