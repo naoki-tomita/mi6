@@ -77,9 +77,13 @@ type MockInstance<T extends Instance> = {
   [key in keyof T]: Mock<Parameters<T[key]>, ReturnType<T[key]>>;
 }
 
+const CHARS = "abcdefghijklmnopqrstuvwxyz";
+function id() {
+  return Array(5).fill(null).map(() => Math.floor(Math.random() * CHARS.length)).join("");
+}
 export function mock<T extends {}>(): T & MockInstance<T> {
   const inner = {} as any;
-  return new Proxy({}, {
+  return new Proxy({__id__: `#${id()}`}, {
     get(_, key, __) {
       return inner[key] = inner[key] ?? createMock();
     }
