@@ -73,4 +73,12 @@ Deno.test("mi6 > #mock > mock createable", () => {
   assertStrictEquals(instance.method3(), x);
 })
 
+Deno.test("mi6 > #mock > mockImplementations", () => {
+  const instance = mock<FooClass>();
+  instance.method1.mockImplementation(() => {
+    return 123;
+  });
+  assertStrictEquals(instance.method1(), 123);
+});
+
 export {};

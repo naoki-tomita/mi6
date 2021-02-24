@@ -9,6 +9,7 @@ interface MockCalled<T extends any[], V> {
 interface Mock<T extends any[], V> extends MockCalled<T, V> {
   (...args: T): V;
   calledWith(...args: T): MockCalled<T, V>;
+  mockImplementation(implementation: (...args: T) => V): Mock<T, V>;
   mock: {
     calls: T[];
   };
@@ -18,8 +19,12 @@ const DefaultArgs = [Symbol("default args")] as unknown as any;
 export function createMock<T extends any[], V>(): Mock<T, V> {
   const stubs: Map<T, V[]> = new Map();
   const calls: T[] = [];
+  const impls: Array<(...args: T) => V> = [];
   const MockFn = (...args: T): V => {
     calls.push(args);
+    if (impls.length > 0) {
+      return impls.shift()!(...args);
+    }
     if (stubs.size === 0) {
       return undefined as unknown as any;
     }
@@ -54,7 +59,7 @@ export function createMock<T extends any[], V>(): Mock<T, V> {
         stubs.set(args, stubs.get(args) ?? []);
         stubs.get(args)!.push(Promise.reject(rejectedValue) as unknown as V);
         return Mock;
-      }
+      },
     };
   };
 
@@ -67,6 +72,10 @@ export function createMock<T extends any[], V>(): Mock<T, V> {
   Mock.mockReturnValueOnce = mockReturnValueOnce;
   Mock.mockResolveValueOnce = mockResolveValueOnce;
   Mock.mockRejectValueOnce = mockRejectValueOnce;
+  Mock.mockImplementation = function(implementation) {
+    impls.push(implementation);
+    return Mock;
+  };
   return Mock;
 }
 
